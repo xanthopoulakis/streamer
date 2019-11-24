@@ -1,7 +1,7 @@
 require 'json'
 require 'csv'
 
-count = 1000000
+count = 300000
 r = 500
 array = count.times.map do |x| 
   phi = 2 * Math::PI * rand()
