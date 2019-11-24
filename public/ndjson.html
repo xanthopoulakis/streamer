@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NDJSON Stream Demo</title>
+  <script src="./can-ndjson-stream.js"></script>
+</head>
+<body>
+  <h1 id="progressor">NDJSON Stream Demo</h1>
+  <canvas id="myCanvas" width="1000" height="1000"></canvas>
+</body>
+  <script>
+
+  var c = document.getElementById("myCanvas");
+  var ctx = c.getContext("2d");
+
+  const streamerr = e => {
+    console.warn("Stream error");
+    console.warn(e);
+  }
+
+  let t = new Date();
+  fetch("http://localhost:9000/data").then((response) => {
+    return can.ndjsonStream(response.body);
+  }).then(todosStream => {
+    var reader = todosStream.getReader();
+
+    reader.read().then(read = result => {
+      if (result.done) {
+        console.log("Done.", (new Date() - t) / 1000);
+        return;
+      }
+
+      result.value.records.forEach(record => {
+        draw(record);
+      });
+
+      reader.read().then(read, streamerr);
+    }, streamerr);
+  });
+
+  var draw = (value) => {
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(${value.x % 255},${value.y % 255},${(value.x * value.y) % 255},${value.val})`
+    ctx.arc(value.x, value.y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  </script>
+</html>

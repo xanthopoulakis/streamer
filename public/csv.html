@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>CSV Loading Demo</title>
+  <script src="./d3-dsv.v1.min.js"></script>
+</head>
+<body>
+  <h1 id="progressor">CSV Loading Demo</h1>
+  <canvas id="myCanvas" width="1000" height="1000"></canvas>
+</body>
+<script>
+  const canvas = document.querySelector('#myCanvas');
+  var ctx = canvas.getContext("2d");
+  let t = new Date();
+
+  fetch("http://localhost:9000/plot.csv")
+  .then((response) => {
+    return response.ok ? response.text() : Promise.reject(response.status);
+  }).then((text) => {
+    let data =  d3.csvParse(text);
+    data.forEach(value => {
+      draw(value);
+    })
+    console.log("Done.", (new Date() - t) / 1000);
+  })
+
+  var draw = (value) => {
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(${value.x % 255},${value.y % 255},${(value.x * value.y) % 255},${value.val})`
+    ctx.arc(value.x, value.y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.closePath();
+  }
+  </script>
+  </html>

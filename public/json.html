@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>JSON Load Demo</title>
+
+</head>
+<body>
+  <h1 id="progressor">JSON Load Demo</h1>
+  <canvas id="myCanvas" width="1000" height="1000"></canvas>
+</body>
+<script>
+
+  const canvas = document.querySelector('#myCanvas');
+  var ctx = canvas.getContext("2d");
+
+  let t = new Date();
+  fetch("http://localhost:9000/plot.json")
+  .then((response) => {
+    return response.ok ? response.json() : Promise.reject(response.status);
+  })
+  .then((data) => {
+    data.records.forEach(value => {
+      draw(value);
+    })
+    console.log("Done.", (new Date() - t) / 1000);
+  });
+    
+  var draw = (value) => {
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(${value.x % 255},${value.y % 255},${(value.x * value.y) % 255},${value.val})`
+    ctx.arc(value.x, value.y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.closePath();
+  }
+  </script>
+  </html>
